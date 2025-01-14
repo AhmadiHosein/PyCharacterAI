@@ -99,7 +99,20 @@ class ChatMethods:
             return chats
 
         raise FetchError("Cannot fetch recent chats.")
+        
+    async def fetch_chat(self, characterid:str, **kwargs) -> List[Chat]:
+        request = await self.__requester.request_async(
+            url=f"https://neo.character.ai/chats/recent/{characterid}",
+            options={"headers": self.__client.get_headers(kwargs.get("token", None))},
+        )
 
+        if request.status_code == 200:
+            raw_chats = request.json().get("chats", [])
+
+            return Chat(raw_chats[0])
+
+        raise FetchError("Cannot fetch recent chats.")
+        
     async def fetch_messages(
         self,
         chat_id,
